@@ -4,12 +4,6 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
 import process from "node:process";
 
-const env = {
-  clientPort: Port.parse(Deno.env.get("CLIENT_PORT")),
-  servereBaseUrl: String(Deno.env.get("SERVER_BASE_URL")),
-  serverPort: Port.parse(Deno.env.get("SERVER_PORT")),
-};
-
 export default defineConfig({
   root: "./src",
   build: {
@@ -18,16 +12,9 @@ export default defineConfig({
   },
   plugins: [react(), deno()],
   server: {
-    port: env.clientPort,
+    port: Port.parse(Deno.env.get("CLIENT_PORT")),
     fs: {
       allow: [searchForWorkspaceRoot(process.cwd()), "../../node_modules"],
-    },
-    proxy: {
-      "/api": {
-        target: `${env.servereBaseUrl}:${env.serverPort}`,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
     },
   },
   test: {

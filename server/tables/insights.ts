@@ -1,24 +1,19 @@
+import type { Insight, InsightInsert } from "$models/insight.ts";
+import type { Database } from "@db/sqlite";
+
 export const createTable = `
-  CREATE TABLE insights (
+  CREATE TABLE IF NOT EXISTS insights (
     id INTEGER PRIMARY KEY ASC NOT NULL,
-    brand INTEGER NOT NULL,
-    createdAt TEXT NOT NULL,
+    brandId INTEGER NOT NULL,
+    createdAt DATE NOT NULL,
     text TEXT NOT NULL
   )
 `;
 
-export type Row = {
-  id: number;
-  brand: number;
-  createdAt: string;
-  text: string;
+export const selectAll = (db: Database) => {
+  return db.sql<Insight>`SELECT * FROM insights`;
 };
 
-export type Insert = {
-  brand: number;
-  createdAt: string;
-  text: string;
+export const insert = (db: Database, item: InsightInsert) => {
+  db.sql`INSERT INTO insights (brandId, createdAt, text) VALUES (${item.brandId}, ${item.createdAt}, ${item.text})`;
 };
-
-export const insertStatement = (item: Insert) =>
-  `INSERT INTO insights (brand, createdAt, text) VALUES (${item.brand}, '${item.createdAt}', '${item.text}')`;

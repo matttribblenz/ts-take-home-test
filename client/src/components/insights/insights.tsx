@@ -2,6 +2,8 @@ import { Trash2Icon } from "lucide-react";
 import { cx } from "../../lib/cx.ts";
 import styles from "./insights.module.css";
 import type { Insight } from "../../schemas/insight.ts";
+import { BRAND_NAMES_BY_ID_MAP } from "../../lib/consts.ts";
+import { useDeleteInsight } from "../../hooks/useDeleteInsight.ts";
 
 type InsightsProps = {
   insights: Insight[];
@@ -9,31 +11,33 @@ type InsightsProps = {
 };
 
 export const Insights = ({ insights, className }: InsightsProps) => {
-  const deleteInsight = () => undefined;
+  const { deleteInsight } = useDeleteInsight();
 
   return (
     <div className={cx(className)}>
       <h1 className={styles.heading}>Insights</h1>
       <div className={styles.list}>
-        {insights?.length
-          ? (
-            insights.map(({ id, text, date, brandId }) => (
+        {insights?.length ? (
+          insights.map(({ id, text, createdAt, brandId }) => {
+            return (
               <div className={styles.insight} key={id}>
                 <div className={styles["insight-meta"]}>
-                  <span>{brandId}</span>
+                  <span>{BRAND_NAMES_BY_ID_MAP[brandId]}</span>
                   <div className={styles["insight-meta-details"]}>
-                    <span>{date.toString()}</span>
+                    <span>{new Date(createdAt).toLocaleString()}</span>
                     <Trash2Icon
                       className={styles["insight-delete"]}
-                      onClick={deleteInsight}
+                      onClick={() => deleteInsight({ id })}
                     />
                   </div>
                 </div>
                 <p className={styles["insight-content"]}>{text}</p>
               </div>
-            ))
-          )
-          : <p>We have no insight!</p>}
+            );
+          })
+        ) : (
+          <p>We have no insight!</p>
+        )}
       </div>
     </div>
   );

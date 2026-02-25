@@ -1,12 +1,13 @@
 import { Database } from "@db/sqlite";
 import * as insightsTable from "$tables/insights.ts";
-import { HasDBClient } from "./shared.ts";
+import type { HasDBClient } from "./shared.ts";
 import { afterAll, beforeAll } from "@std/testing/bdd";
+import type { Insight, InsightInsert } from "$models/insight.ts";
 
 type Fixture = HasDBClient & {
   insights: {
-    insert(insights: insightsTable.Insert[]): void;
-    selectAll(): insightsTable.Row[];
+    insert(insights: InsightInsert[]): void;
+    selectAll(): Insight[];
   };
 };
 
@@ -22,12 +23,10 @@ export const withDB = <R>(fn: (fixture: Fixture) => R): R => {
   return fn({
     db,
     insights: {
-      selectAll() {
-        return db.sql<insightsTable.Row>`SELECT * FROM insights`;
-      },
+      selectAll: () => insightsTable.selectAll(db),
       insert(insights) {
         for (const item of insights) {
-          db.exec(insightsTable.insertStatement(item));
+          insightsTable.insert(db, item);
         }
       },
     },
